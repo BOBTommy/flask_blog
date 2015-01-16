@@ -1,0 +1,27 @@
+가장 먼저 -> 파이썬 설치하기를 하자. 버전은 2.7.8
+이 파이썬 버전을 기반으로 하여서 여러가지 파이썬 애플리케이션을 설치할 때 각자 다른 환경이기 때문에, 다른 환경에 영향을 받지 않기 위하여 각 애플리케이션마다 가상 환경을 설치해 줍니다.
+이것은 virtualenv, pyenv, virtualenv로 설치를 합시다.
+https://github.com/yyuu/pyenv-virtualenv
+https://blog.ansuchan.com/how-to-set-python-dev-env/
+https://github.com/andersoncardoso/pyenv-autoenv
+
+다 설치를 한 이후에는 이제 블로그를 만들기 위한 패키지를 설치해봅시다.
+파이썬은 관련 패키지 리스트를 효과적으로 관리 할 수 있도록 리스트를 작성해서 한번에 관리를 할 수 있게해줍니다. 이러한 관리를 pip 명령어를 통해서 하는데, 일단 먼저 리스트를 작성해보자.
+requiremnets.txt 파일을 생성하고 그 안에 flask를 적어주자, 이제 설치를 해보자.
+# pip install -r requirements.txt
+설치가 다 되었는지 보려면 pip list 명령어를 통해서 볼 수 있습니다.
+
+그 다음으로는 간단하게 앞으로 작성할 웹 애플리케이션의 구조를 만들어보자
+mkdir app
+mkdir app/static
+mkdir app/templates
+mkdir tmp
+
+그 다음에는 app.py 파일을 만들고 기초적인 Hello World를 출력하는 파일을 만들어 봅시다.
+1주차/app.py 참고
+만든 이후에는 이 파일이 실행이 가능함을 알려주기 위해서 
+chmod a+x app.py 를 실행합니다.
+
+이후에는 이 앱을 실행시켜 보아야 하니 다음의 명령어로 실행시킵니다.
+./python app.py
+실행을 하게 되면 일정 주소로 접속하라는 링크가 뜨는데 이 때 이 링크를 들어가면 Hello World가 출력됨을 알 수있다.
