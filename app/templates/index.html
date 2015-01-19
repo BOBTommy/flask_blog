@@ -5,9 +5,16 @@
     {% else %}
     <title>Welcome to microblog</title>
     {% endif %}
-  </head>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+</head>
   <body>
-    <h1>Hi, {{ user.nickname }}!</h1>
+	{% include 'nav.html' %}
+	{% if session.logged_in %}
+		<p>{{ session.user_name }}님이 로그인하셨습니다.</p>
+    	<h1>Hi, {{ session.user_nickname }}!</h1>
+	{% endif %}
     {% for post in posts %}
     <div><p>{{ post.author.nickname }} says: <b>{{ post.body }}</b></p></div>
     {% endfor %}

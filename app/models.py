@@ -1,21 +1,39 @@
-from app import db
+from app import bcrypt
+from init_database import Base
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import DateTime
+from sqlalchemy import Text
+from sqlalchemy.orm import relationship
 
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nickname = db.Column(db.String(64), index=True, unique=True)
-    email = db.Column(db.String(120), index=True, unique=True)
-    posts = db.relationship('Post', backref='author', lazy='dynamic')
-
-    def __repr__(self):
-        return '%r' % (self.nickname)
-
-
-class Post(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+class User(Base):
+    __tablename__ = "user"
+    id = Column(Integer, primary_key=True)
+    nickname = Column(String(64), index=True, unique=True)
+    email = Column(String(120), index=True, unique=True)
+    posts = relationship('Post', backref='author', lazy='dynamic')
+    password = Column(String(256))
 
     def __repr__(self):
-        return "<%r's Post>" % (self.id)
+        return '%r' % self.nickname
+
+    def set_password(self, password):
+        self.password = bcrypt.generate_password_hash(password=password)
+
+    def check_password_hash(self, password):
+        if bcrypt.check_password_hash(pw_hash=self.password,
+                                      password=password):
+            return True
+        else:
+            return False
+
+
+class Post(Base):
+    __tablename__ = "post"
+    id = Column(Integer, primary_key=True)
+    body = Column(Text)
+    timestamp = Column(DateTime)
+    user_id = Column(Integer, ForeignKey('user.id'))
+
+    def __repr__(self):
+        return "<%r's Post>" % self.id
