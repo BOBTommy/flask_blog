@@ -1,3 +1,4 @@
 *.pyc
-.ropeproject/
+.ropeproject/*
 app.db
+app/.ropeproject/*
