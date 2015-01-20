@@ -31,7 +31,9 @@ class User(Base):
 class Post(Base):
     __tablename__ = "post"
     id = Column(Integer, primary_key=True)
+    title = Column(String(64), index=True)
     body = Column(Text)
+    writer = Column(String(64))
     timestamp = Column(DateTime)
     user_id = Column(Integer, ForeignKey('user.id'))
 

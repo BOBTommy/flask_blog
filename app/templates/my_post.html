@@ -1,21 +1,16 @@
+<!DOCTYPE html>
 <html>
 <head>
-    {% if title %}
-    <title>{{ title }} - microblog</title>
-    {% else %}
-    <title>Welcome to microblog</title>
-    {% endif %}
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 </head>
 <body>
-
-{% include 'nav.html' %}
-
+	{% include 'nav.html' %}
+{% for post in posts %}
 <div class="row">
-    {% for post in posts %}
-    <div class="col-md-8 col-md-offset-2">
+
+    <div class="col-md-7 col-md-offset-2">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <a href="{{ url_for('view_post', post_id=post.id) }}"><h3 class="panel-title">{{ post.title }} - {{ post.writer }}</h3></a>
@@ -25,7 +20,12 @@
             </div>
         </div>
     </div>
-    {% endfor %}
+    <div class="col-mid-2">
+        <a class="btn btn-warning" href="#" role="button">수정</a>
+        <a class="btn btn-danger" href="#" role="button">삭제</a>
+    </div>
+
 </div>
+{% endfor %}
 </body>
 </html>

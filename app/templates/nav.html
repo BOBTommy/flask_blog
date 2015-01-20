@@ -8,15 +8,17 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/">Tony 블로그</a>
+      <a class="navbar-brand" href="/">아주 조그마한 블로그</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-          {% for item in menu_item %}
-        <li><a href="#">{{ item }}</a></li>
-          {% endfor %}
+          <li><a href="/write">글쓰기</a></li>
+          <li><a href="/my_post">내 글보기</a></li>
+          {% if session.logged_in %}
+        <li class="active"><a href="#">{{ session.user_nickname }}님 환영합니다.</a></li>
+          {% endif %}
       </ul>
 	  <ul class="nav navbar-nav navbar-right">
 		{% if not session.logged_in %}

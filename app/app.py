@@ -8,11 +8,25 @@ from flask import url_for
 from datetime import timedelta
 from init_database import db_session
 from flask.ext.bcrypt import Bcrypt
+from jinja2 import evalcontextfilter, Markup, escape
+import datetime
+import re
 
 
+_paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 app = Flask(__name__)
 app.config.from_object('config')
 bcrypt = Bcrypt(app)
+
+
+@app.template_filter()
+@evalcontextfilter
+def nl2br(eval_ctx, value):
+    result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n')
+                          for p in _paragraph_re.split(escape(value)))
+    if eval_ctx.autoescape:
+        result = Markup(result)
+    return result
 
 
 @app.before_request
@@ -24,27 +38,25 @@ def make_session_timeout():
 @app.route('/')
 @app.route('/index')
 def index():
-    user = {'nickname': 'Tommy'}
-    posts = [
-        {
-            'author': {'nickname': 'John'},
-            'body': 'Beautiful day!'
-        },
-        {
-            'author': {'nickname': 'Tony'},
-            'body': 'Worst day!'
-        }
-    ]
-    menu_item = [u'글보기', u'글쓰기']
+    from models import Post, User
+    try:
+        posts = Post.query.order_by('id desc').all()[:5]
+    except IndexError:
+        posts = Post.query.order_by('id desc').all()
+    users = []
+    for post in posts:
+        users.append(User.query.get(post.user_id))
     return render_template('index.html',
                            title='Flask',
                            posts=posts,
-                           user=user,
-                           menu_item=menu_item)
+                           users=users)
 
 
 @app.route('/login')
 def login():
+    if 'logged_in' in session:
+        if session['logged_in']:
+            return redirect(url_for('index'))
     return render_template('login.html')
 
 
@@ -65,6 +77,9 @@ def login_process():
 
 @app.route('/join')
 def join():
+    if 'user_name' in session:
+        if 'logged_in' in session and session['logged_in']:
+            return redirect('index')
     return render_template('join.html')
 
 
@@ -87,6 +102,52 @@ def logout():
     session.pop('user_name', None)
     session.pop('user_nickname', None)
     return redirect(url_for('index'))
+
+
+@app.route('/write')
+def write_post():
+    menu_item = [u'글보기', u'친구 목록']
+    if 'user_name' not in session:
+        return redirect(url_for('login'))
+    return render_template('write.html',
+                           menu_item=menu_item)
+
+
+@app.route('/write_process', methods=['POST'])
+def write_process():
+    if not session['logged_in']:
+        return redirect(url_for('index'))
+    from models import Post, User
+    u = User.query.filter_by(email=session['user_name']).first()
+    p = Post()
+    p.title = request.form['post_title']
+    p.body = request.form['post_body']
+    p.writer = session['user_nickname']
+    p.timestamp = datetime.datetime.utcnow()
+    p.user_id = u.id
+    db_session.add(p)
+    db_session.commit()
+    return redirect(url_for('index'))
+
+
+@app.route('/posts/<int:post_id>')
+def view_post(post_id):
+    from models import Post
+    p = Post.query.get(post_id)
+    return render_template('post_detail.html',
+                           post=p)
+
+
+@app.route('/my_post')
+def view_my_post():
+    if 'logged_in' not in session or not session['logged_in']:
+        return redirect(url_for('login'))
+    from models import User, Post
+    u = User.query.filter_by(email=session['user_name']).first()
+    posts = Post.query.filter_by(user_id=u.id).all()
+    return render_template('my_post.html',
+                           posts=posts)
+
 
 app.secret_key = '\xa9~\xd8\\\xe0\x90}N^\xab\xd9]\xa6.\xc2\x0f8U\xcd\x8d,\xa5JY'
 
