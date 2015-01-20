@@ -138,6 +138,24 @@ def view_post(post_id):
                            post=p)
 
 
+@app.route('/delete_post/<int:post_id>')
+def delete_post(post_id):
+    if 'logged_in' not in session:
+        return redirect(url_for('index'))
+    elif not session['logged_in']:
+        return redirect(url_for('index'))
+
+    from models import Post, User
+    p = Post.query.get(post_id)
+    u = User.query.get(p.user_id)
+    if u.email != session['user_name']:
+        return redirect(url_for('login'))
+
+    db_session.delete(p)
+    db_session.commit()
+    return redirect(url_for('view_my_post'))
+
+
 @app.route('/my_post')
 def view_my_post():
     if 'logged_in' not in session or not session['logged_in']:
