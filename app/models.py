@@ -1,4 +1,3 @@
-from app import bcrypt
 from init_database import Base
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy import DateTime
@@ -18,9 +17,11 @@ class User(Base):
         return '%r' % self.nickname
 
     def set_password(self, password):
+        from app import bcrypt
         self.password = bcrypt.generate_password_hash(password=password)
 
     def check_password_hash(self, password):
+        from app import bcrypt
         if bcrypt.check_password_hash(pw_hash=self.password,
                                       password=password):
             return True

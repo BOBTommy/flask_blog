@@ -9,6 +9,7 @@ from datetime import timedelta
 from init_database import db_session
 from flask.ext.bcrypt import Bcrypt
 from jinja2 import evalcontextfilter, Markup, escape
+from models import User, Post
 import datetime
 import re
 
@@ -38,7 +39,6 @@ def make_session_timeout():
 @app.route('/')
 @app.route('/index')
 def index():
-    from models import Post, User
     try:
         posts = Post.query.order_by('id desc').all()[:5]
     except IndexError:
@@ -63,11 +63,10 @@ def login():
 @app.route('/login_process', methods=['POST'])
 def login_process():
     if request.method == 'POST':
-        from models import User
         user_email = request.form['user_email']
         user_password = request.form['user_password']
         u = User.query.filter_by(email=user_email).first()
-        if not u is None:
+        if u is not None:
             if u.check_password_hash(password=user_password):
                 session['user_name'] = user_email
                 session['user_nickname'] = u.nickname
@@ -86,7 +85,6 @@ def join():
 @app.route('/join_process', methods=['POST'])
 def join_process():
     if request.method == 'POST':
-        from models import User
         new_user = User()
         new_user.email = request.form['user_email']
         new_user.nickname = request.form['user_nickname']
@@ -117,7 +115,6 @@ def write_post():
 def write_process():
     if not session['logged_in']:
         return redirect(url_for('index'))
-    from models import Post, User
     u = User.query.filter_by(email=session['user_name']).first()
     p = Post()
     p.title = request.form['post_title']
@@ -132,7 +129,6 @@ def write_process():
 
 @app.route('/posts/<int:post_id>')
 def view_post(post_id):
-    from models import Post
     p = Post.query.get(post_id)
     return render_template('post_detail.html',
                            post=p)
@@ -145,7 +141,6 @@ def delete_post(post_id):
     elif not session['logged_in']:
         return redirect(url_for('index'))
 
-    from models import Post, User
     p = Post.query.get(post_id)
     u = User.query.get(p.user_id)
     if u.email != session['user_name']:
@@ -160,7 +155,6 @@ def delete_post(post_id):
 def view_my_post():
     if 'logged_in' not in session or not session['logged_in']:
         return redirect(url_for('login'))
-    from models import User, Post
     u = User.query.filter_by(email=session['user_name']).first()
     posts = Post.query.filter_by(user_id=u.id).all()
     return render_template('my_post.html',
