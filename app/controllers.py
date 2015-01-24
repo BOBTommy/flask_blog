@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from flask import Flask
 from flask import render_template
 from flask import request
 from flask import session
@@ -7,27 +6,9 @@ from flask import redirect
 from flask import url_for
 from datetime import timedelta
 from init_database import db_session
-from flask.ext.bcrypt import Bcrypt
-from jinja2 import evalcontextfilter, Markup, escape
 from models import User, Post
+from app import app
 import datetime
-import re
-
-
-_paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
-app = Flask(__name__)
-app.config.from_object('config')
-bcrypt = Bcrypt(app)
-
-
-@app.template_filter()
-@evalcontextfilter
-def nl2br(eval_ctx, value):
-    result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n')
-                          for p in _paragraph_re.split(escape(value)))
-    if eval_ctx.autoescape:
-        result = Markup(result)
-    return result
 
 
 @app.before_request
@@ -159,11 +140,3 @@ def view_my_post():
     posts = Post.query.filter_by(user_id=u.id).all()
     return render_template('my_post.html',
                            posts=posts)
-
-
-app.secret_key = '\xa9~\xd8\\\xe0\x90}N^\xab\xd9]\xa6.\xc2\x0f8U\xcd\x8d,\xa5JY'
-
-# When this application package is imported, this will block automatically
-# starting app
-if __name__ == '__main__':
-    app.run(debug=True)
