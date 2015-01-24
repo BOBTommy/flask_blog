@@ -101,7 +101,6 @@ def write_process():
     p = Post()
     p.title = request.form['post_title']
     p.body = request.form['post_body']
-    p.writer = session['user_nickname']
     p.timestamp = datetime.datetime.utcnow()
     p.user_id = u.id
     db_session.add(p)
