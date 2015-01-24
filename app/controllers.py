@@ -70,6 +70,7 @@ def join_process():
         new_user.email = request.form['user_email']
         new_user.nickname = request.form['user_nickname']
         new_user.set_password(request.form['user_password'])
+        new_user.is_admin = False
         db_session.add(new_user)
         db_session.commit()
         return redirect(url_for('index'))

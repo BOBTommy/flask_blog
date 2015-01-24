@@ -14,6 +14,7 @@ class User(Base):
     email = db.Column(db.String(120), index=True, unique=True)
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     password = db.Column(db.String(256))
+    is_admin = db.Column(db.Boolean)
 
     def __repr__(self):
         return '%r' % self.nickname
@@ -35,7 +36,6 @@ class Post(Base):
     __tablename__ = "post"
     title = db.Column(db.String(64), index=True)
     body = db.Column(db.Text)
-    writer = db.Column(db.String(64))
     timestamp = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
