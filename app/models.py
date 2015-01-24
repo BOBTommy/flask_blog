@@ -1,17 +1,19 @@
-from init_database import Base
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy import DateTime
-from sqlalchemy import Text
-from sqlalchemy.orm import relationship
+from app import db
+
+
+class Base(db.Model):
+
+    __abstract__ = True
+
+    id = db.Column(db.Integer, primary_key= True)
 
 
 class User(Base):
     __tablename__ = "user"
-    id = Column(Integer, primary_key=True)
-    nickname = Column(String(64), index=True, unique=True)
-    email = Column(String(120), index=True, unique=True)
-    posts = relationship('Post', backref='author', lazy='dynamic')
-    password = Column(String(256))
+    nickname = db.Column(db.String(64), index=True, unique=True)
+    email = db.Column(db.String(120), index=True, unique=True)
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
+    password = db.Column(db.String(256))
 
     def __repr__(self):
         return '%r' % self.nickname
@@ -31,12 +33,11 @@ class User(Base):
 
 class Post(Base):
     __tablename__ = "post"
-    id = Column(Integer, primary_key=True)
-    title = Column(String(64), index=True)
-    body = Column(Text)
-    writer = Column(String(64))
-    timestamp = Column(DateTime)
-    user_id = Column(Integer, ForeignKey('user.id'))
+    title = db.Column(db.String(64), index=True)
+    body = db.Column(db.Text)
+    writer = db.Column(db.String(64))
+    timestamp = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
         return "<%r's Post>" % self.id
