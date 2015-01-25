@@ -5,7 +5,6 @@ from flask import session
 from flask import redirect
 from flask import url_for
 from datetime import timedelta
-from init_database import db_session
 from models import User, Post
 from app import app
 import datetime
@@ -71,8 +70,8 @@ def join_process():
         new_user.nickname = request.form['user_nickname']
         new_user.set_password(request.form['user_password'])
         new_user.is_admin = False
-        db_session.add(new_user)
-        db_session.commit()
+        db.session.add(new_user)
+        db.session.commit()
         return redirect(url_for('index'))
 
 
@@ -101,8 +100,8 @@ def write_process():
     p.body = request.form['post_body']
     p.timestamp = datetime.datetime.utcnow()
     p.user_id = u.id
-    db_session.add(p)
-    db_session.commit()
+    db.session.add(p)
+    db.session.commit()
     return redirect(url_for('index'))
 
 
@@ -125,8 +124,8 @@ def delete_post(post_id):
     if u.email != session['user_name']:
         return redirect(url_for('login'))
 
-    db_session.delete(p)
-    db_session.commit()
+    db.session.delete(p)
+    db.session.commit()
     return redirect(url_for('view_my_post'))
 
 

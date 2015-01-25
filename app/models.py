@@ -14,7 +14,7 @@ class User(Base):
     email = db.Column(db.String(120), index=True, unique=True)
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     password = db.Column(db.String(256))
-    is_admin = db.Column(db.Boolean)
+    is_admin = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return '%r' % self.nickname
