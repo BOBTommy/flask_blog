@@ -9,5 +9,3 @@ bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 
 from controllers import *
-
-db.create_all()
