@@ -86,11 +86,9 @@ def logout():
 
 @app.route('/write')
 def write_post():
-    menu_item = [u'글보기', u'친구 목록']
     if 'user_name' not in session:
         return redirect(url_for('login'))
-    return render_template('write.html',
-                           menu_item=menu_item)
+    return render_template('write.html')
 
 
 @app.route('/write_process', methods=['POST'])
