@@ -7,6 +7,7 @@ from flask import url_for
 from datetime import timedelta
 from models import User, Post
 from app import app
+from app import db
 import datetime
 
 
