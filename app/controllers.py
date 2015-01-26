@@ -149,13 +149,19 @@ def delete_post(post_id):
     elif not session['logged_in']:
         return redirect(url_for('index'))
 
-    p = Post.query.get(post_id)
-    u = User.query.get(p.user_id)
-    if u.email != session['user_name']:
-        return redirect(url_for('login'))
+    if session['is_admin']:
+        p = Post.query.get(post_id)
+    else:
+        p = Post.query.get(post_id)
+        u = User.query.get(p.user_id)
+        if u.email != session['user_name']:
+            return redirect(url_for('login'))
 
     db.session.delete(p)
     db.session.commit()
+
+    if session['is_admin']:
+        return redirect(url_for('admin_page'))
     return redirect(url_for('view_my_post'))
 
 
@@ -174,8 +180,10 @@ def admin_page():
     if 'is_admin' not in session or not session['is_admin']:
         return redirect(url_for('index'))
     users = User.query.all()
+    posts = Post.query.all()
     return render_template('admin.html',
-                           users=users)
+                           users=users,
+                           posts=posts)
 
 
 @app.route('/delete_user/<int:user_id>')
