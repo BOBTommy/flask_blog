@@ -52,6 +52,8 @@ def login_process():
                 session['user_name'] = user_email
                 session['user_nickname'] = u.nickname
                 session['logged_in'] = True
+                if u.is_admin:
+                    session['is_admin'] = True
         return redirect(url_for('index'))
 
 
