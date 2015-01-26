@@ -115,6 +115,18 @@ def view_post(post_id):
                            post=p)
 
 
+@app.route('/edit_post/<int:post_id>')
+def edit_post(post_id):
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    user = User.query.filter_by(email=session['user_name']).first()
+    post = Post.query.get(post_id)
+    if post.user_id != user.id:
+        return redirect(url_for('index'))
+    return render_template('edit_post.html',
+                           post=post)
+
+
 @app.route('/delete_post/<int:post_id>')
 def delete_post(post_id):
     if 'logged_in' not in session:
