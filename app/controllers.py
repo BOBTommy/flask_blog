@@ -52,6 +52,8 @@ def login_process():
                 session['user_name'] = user_email
                 session['user_nickname'] = u.nickname
                 session['logged_in'] = True
+                if u.is_admin:
+                    session['is_admin'] = True
         return redirect(url_for('index'))
 
 
@@ -79,6 +81,7 @@ def join_process():
 @app.route('/logout')
 def logout():
     session['logged_in'] = False
+    session.pop('is_admin', None)
     session.pop('user_name', None)
     session.pop('user_nickname', None)
     return redirect(url_for('index'))
@@ -113,6 +116,32 @@ def view_post(post_id):
                            post=p)
 
 
+@app.route('/edit_post/<int:post_id>')
+def edit_post(post_id):
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    user = User.query.filter_by(email=session['user_name']).first()
+    post = Post.query.get(post_id)
+    if post.user_id != user.id:
+        return redirect(url_for('index'))
+    return render_template('edit_post.html',
+                           post=post)
+
+
+@app.route('/edit_process/<int:post_id>', methods=['POST'])
+def edit_post_process(post_id):
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    user = User.query.filter_by(email=session['user_name']).first()
+    post = Post.query.get(post_id)
+    if post.user_id != user.id:
+        return redirect(url_for('index'))
+    post.title = request.form['post_title']
+    post.body = request.form['post_body']
+    db.session.commit()
+    return redirect(url_for('view_my_post'))
+
+
 @app.route('/delete_post/<int:post_id>')
 def delete_post(post_id):
     if 'logged_in' not in session:
@@ -120,13 +149,19 @@ def delete_post(post_id):
     elif not session['logged_in']:
         return redirect(url_for('index'))
 
-    p = Post.query.get(post_id)
-    u = User.query.get(p.user_id)
-    if u.email != session['user_name']:
-        return redirect(url_for('login'))
+    if session['is_admin']:
+        p = Post.query.get(post_id)
+    else:
+        p = Post.query.get(post_id)
+        u = User.query.get(p.user_id)
+        if u.email != session['user_name']:
+            return redirect(url_for('login'))
 
     db.session.delete(p)
     db.session.commit()
+
+    if session['is_admin']:
+        return redirect(url_for('admin_page'))
     return redirect(url_for('view_my_post'))
 
 
@@ -138,3 +173,29 @@ def view_my_post():
     posts = Post.query.filter_by(user_id=u.id).all()
     return render_template('my_post.html',
                            posts=posts)
+
+
+@app.route('/admin')
+def admin_page():
+    if 'is_admin' not in session or not session['is_admin']:
+        return redirect(url_for('index'))
+    users = User.query.all()
+    posts = Post.query.all()
+    return render_template('admin.html',
+                           users=users,
+                           posts=posts)
+
+
+@app.route('/delete_user/<int:user_id>')
+def delete_user(user_id):
+    if 'is_admin' in session or session['is_admin']:
+        u = User.query.get(user_id)
+        posts = Post.query.filter_by(user_id=user_id).all()
+        if posts is not None:
+            for post in posts:
+                db.session.delete(post)
+        db.session.delete(u)
+        db.session.commit()
+        return redirect(url_for('admin_page'))
+    else:
+        return redirect(url_for('index'))
