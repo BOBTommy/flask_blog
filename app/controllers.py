@@ -166,3 +166,10 @@ def view_my_post():
     posts = Post.query.filter_by(user_id=u.id).all()
     return render_template('my_post.html',
                            posts=posts)
+
+
+@app.route('/admin')
+def admin_page():
+    users = User.query.all()
+    return render_template('admin.html',
+                           users=users)
