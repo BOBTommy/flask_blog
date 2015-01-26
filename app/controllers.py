@@ -81,6 +81,7 @@ def join_process():
 @app.route('/logout')
 def logout():
     session['logged_in'] = False
+    session.pop('is_admin', None)
     session.pop('user_name', None)
     session.pop('user_nickname', None)
     return redirect(url_for('index'))
@@ -170,6 +171,23 @@ def view_my_post():
 
 @app.route('/admin')
 def admin_page():
+    if 'is_admin' not in session or not session['is_admin']:
+        return redirect(url_for('index'))
     users = User.query.all()
     return render_template('admin.html',
                            users=users)
+
+
+@app.route('/delete_user/<int:user_id>')
+def delete_user(user_id):
+    if 'is_admin' in session or session['is_admin']:
+        u = User.query.get(user_id)
+        posts = Post.query.filter_by(user_id=user_id).all()
+        if posts is not None:
+            for post in posts:
+                db.session.delete(post)
+        db.session.delete(u)
+        db.session.commit()
+        return redirect(url_for('admin_page'))
+    else:
+        return redirect(url_for('index'))

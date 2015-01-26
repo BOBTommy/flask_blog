@@ -14,7 +14,7 @@
   <div class="panel-body">
       {% for user in users %}
       <p>
-          {{user.email}} - {{user.nickname}} <a class="btn btn-danger" href="#" role="button">X</a>
+          {{user.email}} - {{user.nickname}} <a class="btn btn-danger" href="{{url_for('delete_user',user_id=user.id)}}" role="button">X</a>
       </p>
       {% endfor %}
   </div>
