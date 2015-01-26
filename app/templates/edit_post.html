@@ -13,7 +13,7 @@
 <body>
 {% include 'nav.html' %}
 <div class="row well col-md-8 col-md-offset-2">
-    <form role="form" action="/modify_process" method="POST">
+    <form role="form" action="{{url_for('edit_post_process',post_id=post.id)}}" method="POST">
         <div class="form-group form-group-lg col-md-6 col-md-offset-3">
 
             <label class="col-sm-2 control-label" for="lg">제목</label>

@@ -127,6 +127,20 @@ def edit_post(post_id):
                            post=post)
 
 
+@app.route('/edit_process/<int:post_id>', methods=['POST'])
+def edit_post_process(post_id):
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    user = User.query.filter_by(email=session['user_name']).first()
+    post = Post.query.get(post_id)
+    if post.user_id != user.id:
+        return redirect(url_for('index'))
+    post.title = request.form['post_title']
+    post.body = request.form['post_body']
+    db.session.commit()
+    return redirect(url_for('view_my_post'))
+
+
 @app.route('/delete_post/<int:post_id>')
 def delete_post(post_id):
     if 'logged_in' not in session:
