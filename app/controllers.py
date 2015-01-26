@@ -52,8 +52,6 @@ def login_process():
                 session['user_name'] = user_email
                 session['user_nickname'] = u.nickname
                 session['logged_in'] = True
-                if u.is_admin:
-                    session['is_admin'] = True
         return redirect(url_for('index'))
 
 
@@ -140,12 +138,3 @@ def view_my_post():
     posts = Post.query.filter_by(user_id=u.id).all()
     return render_template('my_post.html',
                            posts=posts)
-
-
-@app.route('/admin')
-def admin_page():
-    if 'logged_in' not in session or not session['logged_in']:
-        return redirect(url_for('login'))
-    user = User.query.filter_by(email=session['user_name']).first()
-    if not user.is_admin:
-        return redirect(url_for('index'))

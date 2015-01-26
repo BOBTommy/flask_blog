@@ -17,9 +17,6 @@
           <li><a href="/write">글쓰기</a></li>
           <li><a href="/my_post">내 글보기</a></li>
           {% if session.logged_in %}
-          {% if session.is_admin %}
-          <li><a href="/admin">관리자 페이지</a></li>
-          {% endif %}
         <li class="active"><a href="#">{{ session.user_nickname }}님 환영합니다.</a></li>
           {% endif %}
       </ul>
