@@ -149,7 +149,7 @@ def delete_post(post_id):
     elif not session['logged_in']:
         return redirect(url_for('index'))
 
-    if session['is_admin']:
+    if 'is_admin' in session and session['is_admin']:
         p = Post.query.get(post_id)
     else:
         p = Post.query.get(post_id)
