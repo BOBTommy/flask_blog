@@ -160,7 +160,7 @@ def delete_post(post_id):
     db.session.delete(p)
     db.session.commit()
 
-    if session['is_admin']:
+    if 'is_admin' in session and session['is_admin']:
         return redirect(url_for('admin_page'))
     return redirect(url_for('view_my_post'))
 
